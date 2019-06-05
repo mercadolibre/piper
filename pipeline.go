@@ -28,6 +28,8 @@ func (p *Pipeline) AddStage(s Stage) *Pipeline {
 }
 
 func (p Pipeline) Run() {
+	p.wg.Add(len(p.stages))
+
 	for i := 0; i < len(p.stages); i++ {
 		p.stages[i].run(p.wg)
 	}

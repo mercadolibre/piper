@@ -18,10 +18,10 @@ func (s *Stage) Compose(next Stage) {
 
 func (s *Stage) run(wg *sync.WaitGroup) {
 	go func() {
-		wg.Add(1)
+		defer wg.Done()
+		defer close(s.out)
+
 		s.op(s.in, s.out)
-		close(s.out)
-		wg.Done()
 	}()
 }
 
