@@ -1,11 +1,7 @@
 package piper
 
 func newSplitterStage(stages ...*Stage) *Stage {
-	return &Stage{
-		in:  make(chan interface{}),
-		out: make(chan interface{}),
-		op:  makeSplitter(stages...),
-	}
+	return NewSyncStage(makeSplitter(stages...))
 }
 
 func makeSplitter(stages ...*Stage) Operator {

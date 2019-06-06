@@ -6,9 +6,5 @@ var sinkOperator = Operator(func(in chan interface{}, out chan interface{}) {
 })
 
 func newSinkStage() *Stage {
-	return &Stage{
-		in:  make(chan interface{}),
-		out: make(chan interface{}),
-		op:  sinkOperator,
-	}
+	return NewSyncStage(sinkOperator)
 }

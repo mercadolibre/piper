@@ -31,6 +31,10 @@ func (p Pipeline) In() chan interface{} {
 	return p.head.in
 }
 
+func (p Pipeline) Out() chan interface{} {
+	return p.head.Out()
+}
+
 func (p Pipeline) Split(ps ...Pipeline) Pipeline {
 	heads := make([]*Stage, len(ps))
 	for i, p := range ps {

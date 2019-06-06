@@ -29,8 +29,7 @@ func main() {
 		}
 	})
 
-	p := piper.NewPipeline().
-		AddStage(plus).
+	p := piper.NewPipeline(plus).
 		AddStage(square).
 		AddStage(output)
 

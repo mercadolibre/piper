@@ -29,12 +29,11 @@ func main() {
 		}
 	})
 
-	p1 := piper.NewPipeline().AddStage(id)
-	p2 := piper.NewPipeline().AddStage(square)
+	p1 := piper.NewPipeline(id)
+	p2 := piper.NewPipeline(square)
 
-	p := piper.NewPipeline().
-		AddStage(plus).
-		Split(*p1, *p2)
+	p := piper.NewPipeline(plus).
+		Split(p1, p2)
 
 	go func() {
 		for x := range p1.Out() {
