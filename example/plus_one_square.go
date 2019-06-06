@@ -40,6 +40,6 @@ func main() {
 	in <- 3
 	p.Stop()
 
-	p.Wait()
+	<-p.Done()
 	fmt.Println("done")
 }

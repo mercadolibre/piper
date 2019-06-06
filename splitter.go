@@ -18,7 +18,7 @@ func makeSplitter(stages ...*Stage) Operator {
 
 		for _, p := range stages {
 			p.stop()
-			p.wait()
+			<-p.done
 		}
 	})
 }

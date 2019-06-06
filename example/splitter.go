@@ -55,6 +55,6 @@ func main() {
 
 	p.Stop()
 	fmt.Println("will wait")
-	p.Wait()
+	<-p.Done()
 	fmt.Println("done ")
 }

@@ -2,16 +2,21 @@ package piper
 
 type Pipeline struct {
 	head *Stage
+	tail *Stage
 }
 
-func NewPipeline(head *Stage) Pipeline {
+func NewPipeline(s *Stage) Pipeline {
 	return Pipeline{
-		head: head,
+		head: s,
+		tail: s,
 	}
 }
 
 func (p Pipeline) AddStage(s *Stage) Pipeline {
-	p.head.compose(s)
+	p.tail.out = s.in
+	p.tail.next = s
+	p.tail = s
+
 	return p
 }
 
@@ -23,8 +28,8 @@ func (p Pipeline) Stop() {
 	p.head.stop()
 }
 
-func (p Pipeline) Wait() {
-	p.head.wait()
+func (p Pipeline) Done() chan struct{} {
+	return p.tail.done
 }
 
 func (p Pipeline) In() chan interface{} {
@@ -32,7 +37,7 @@ func (p Pipeline) In() chan interface{} {
 }
 
 func (p Pipeline) Out() chan interface{} {
-	return p.head.Out()
+	return p.tail.out
 }
 
 func (p Pipeline) Split(ps ...Pipeline) Pipeline {
