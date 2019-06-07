@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	square := piper.NewSyncStage(func(in chan interface{}, out chan interface{}) {
+	square := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n * n
 		}
 	})
 
-	plus := piper.NewSyncStage(func(in chan interface{}, out chan interface{}) {
+	plus := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n + 1
@@ -23,15 +23,16 @@ func main() {
 		time.Sleep(time.Second)
 	})
 
-	output := piper.NewSyncStage(func(in chan interface{}, out chan interface{}) {
+	output := piper.SinkOperator(func(in <-chan interface{}) {
 		for _n := range in {
 			fmt.Println(_n)
 		}
 	})
 
-	p := piper.NewPipeline(plus).
-		AddStage(square).
-		AddStage(output)
+	p := piper.NewBuilder().
+		AddLast(plus).
+		AddLast(square).
+		Sink(output)
 
 	p.Run()
 	in := p.In()
@@ -40,6 +41,6 @@ func main() {
 	in <- 3
 	p.Stop()
 
-	<-p.Done()
+	p.Wait()
 	fmt.Println("done")
 }

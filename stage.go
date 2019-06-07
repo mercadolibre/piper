@@ -1,6 +1,6 @@
 package piper
 
-type Operator func(chan interface{}, chan interface{})
+type Operator func(<-chan interface{}, chan<- interface{})
 
 type Stage struct {
 	in   chan interface{}
@@ -27,7 +27,7 @@ func (s *Stage) stop() {
 	close(s.in)
 }
 
-func NewSyncStage(op Operator) *Stage {
+func newStage(op Operator) *Stage {
 	return &Stage{
 		done: make(chan struct{}, 1),
 		in:   make(chan interface{}),
@@ -37,7 +37,7 @@ func NewSyncStage(op Operator) *Stage {
 	}
 }
 
-func NewBufferedStage(bufSize int, op Operator) *Stage {
+func newBufferedStage(bufSize int, op Operator) *Stage {
 	return &Stage{
 		done: make(chan struct{}, 1),
 		in:   make(chan interface{}, bufSize),

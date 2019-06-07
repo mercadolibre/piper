@@ -1,24 +1,24 @@
 package piper
 
-func newSplitterStage(stages ...*Stage) *Stage {
-	return NewSyncStage(makeSplitter(stages...))
+func newSplitterStage(ps ...*Pipeline) *Stage {
+	return newSinkStage(makeSplitter(ps...))
 }
 
-func makeSplitter(stages ...*Stage) Operator {
-	return Operator(func(in chan interface{}, out chan interface{}) {
-		for _, p := range stages {
-			p.run()
+func makeSplitter(ps ...*Pipeline) SinkOperator {
+	return SinkOperator(func(in <-chan interface{}) {
+		for _, p := range ps {
+			p.Run()
 		}
 
 		for msg := range in {
-			for _, s := range stages {
-				s.in <- msg
+			for _, p := range ps {
+				p.In() <- msg
 			}
 		}
 
-		for _, p := range stages {
-			p.stop()
-			<-p.done
+		for _, p := range ps {
+			p.Stop()
+			p.Wait()
 		}
 	})
 }
