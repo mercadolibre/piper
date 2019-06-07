@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	plus := piper.NewBufferedStage(10, func(in chan interface{}, out chan interface{}) {
+	plus := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n + 1
 		}
 	})
 
-	square := piper.NewSyncStage(func(in chan interface{}, out chan interface{}) {
+	square := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n * n
@@ -23,27 +23,27 @@ func main() {
 		time.Sleep(2 * time.Second)
 	})
 
-	id := piper.NewSyncStage(func(in chan interface{}, out chan interface{}) {
+	id := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			out <- _n
 		}
 	})
 
-	p1 := piper.NewPipeline().AddStage(id)
-	p2 := piper.NewPipeline().AddStage(square)
+	p1, out1 := piper.NewBuilder().Output(id)
+	p2, out2 := piper.NewBuilder().Output(square)
 
-	p := piper.NewPipeline().
-		AddStage(plus).
-		Split(*p1, *p2)
+	p := piper.NewBuilder().
+		AddLastBuffered(10, plus).
+		Split(p1, p2)
 
 	go func() {
-		for x := range p1.Out() {
+		for x := range out1 {
 			fmt.Println("id: ", x)
 		}
 	}()
 
 	go func() {
-		for x := range p2.Out() {
+		for x := range out2 {
 			fmt.Println("square: ", x)
 		}
 	}()
@@ -56,6 +56,6 @@ func main() {
 
 	p.Stop()
 	fmt.Println("will wait")
-	p.Wait()
+	<-p.Done()
 	fmt.Println("done ")
 }

@@ -1,15 +1,11 @@
 package piper
 
-func newSplitterStage(ps ...Pipeline) Stage {
-	return Stage{
-		in:  make(chan interface{}),
-		out: make(chan interface{}),
-		op:  makeSplitter(ps...),
-	}
+func newSplitterStage(ps ...*Pipeline) *Stage {
+	return newSinkStage(makeSplitter(ps...))
 }
 
-func makeSplitter(ps ...Pipeline) Operator {
-	return Operator(func(in chan interface{}, out chan interface{}) {
+func makeSplitter(ps ...*Pipeline) SinkOperator {
+	return SinkOperator(func(in <-chan interface{}) {
 		for _, p := range ps {
 			p.Run()
 		}

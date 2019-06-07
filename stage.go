@@ -1,42 +1,43 @@
 package piper
 
-import (
-	"sync"
-)
-
-type Operator func(chan interface{}, chan interface{})
+type Operator func(<-chan interface{}, chan<- interface{})
 
 type Stage struct {
-	in  chan interface{}
-	out chan interface{}
-	op  Operator
+	in   chan interface{}
+	out  chan interface{}
+	done chan struct{}
+
+	op   Operator
+	next *Stage
 }
 
-func (s *Stage) Compose(next Stage) {
-	s.out = next.in
+func (s *Stage) run() {
+	defer close(s.out)
+
+	s.op(s.in, s.out)
+	s.done <- struct{}{}
 }
 
-func (s *Stage) run(wg *sync.WaitGroup) {
-	go func() {
-		defer wg.Done()
-		defer close(s.out)
-
-		s.op(s.in, s.out)
-	}()
+func (s *Stage) stop() {
+	close(s.in)
 }
 
-func NewSyncStage(op Operator) Stage {
-	return Stage{
-		in:  make(chan interface{}),
-		out: make(chan interface{}),
-		op:  op,
+func newStage(op Operator) *Stage {
+	return &Stage{
+		done: make(chan struct{}, 1),
+		in:   make(chan interface{}),
+		out:  make(chan interface{}),
+		next: nil,
+		op:   op,
 	}
 }
 
-func NewBufferedStage(bufSize int, op Operator) Stage {
-	return Stage{
-		in:  make(chan interface{}, bufSize),
-		out: make(chan interface{}, bufSize),
-		op:  op,
+func newBufferedStage(bufSize int, op Operator) *Stage {
+	return &Stage{
+		done: make(chan struct{}, 1),
+		in:   make(chan interface{}, bufSize),
+		out:  make(chan interface{}, bufSize),
+		next: nil,
+		op:   op,
 	}
 }
