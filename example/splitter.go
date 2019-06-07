@@ -8,14 +8,14 @@ import (
 )
 
 func main() {
-	plus := piper.Operator(func(in chan interface{}, out chan interface{}) {
+	plus := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n + 1
 		}
 	})
 
-	square := piper.Operator(func(in chan interface{}, out chan interface{}) {
+	square := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			n := _n.(int)
 			out <- n * n
@@ -23,7 +23,7 @@ func main() {
 		time.Sleep(2 * time.Second)
 	})
 
-	id := piper.Operator(func(in chan interface{}, out chan interface{}) {
+	id := piper.Operator(func(in <-chan interface{}, out chan<- interface{}) {
 		for _n := range in {
 			out <- _n
 		}

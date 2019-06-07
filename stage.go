@@ -12,15 +12,10 @@ type Stage struct {
 }
 
 func (s *Stage) run() {
-	go func() {
-		defer close(s.out)
+	defer close(s.out)
 
-		if s.next != nil {
-			s.next.run()
-		}
-		s.op(s.in, s.out)
-		s.done <- struct{}{}
-	}()
+	s.op(s.in, s.out)
+	s.done <- struct{}{}
 }
 
 func (s *Stage) stop() {

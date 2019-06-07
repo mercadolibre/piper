@@ -26,7 +26,9 @@ func (p *Pipeline) addLast(s *Stage) *Pipeline {
 }
 
 func (p Pipeline) Run() {
-	p.head.run()
+	for s := p.head; s != nil; s = s.next {
+		go s.run()
+	}
 }
 
 func (p Pipeline) Stop() {
