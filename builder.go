@@ -22,7 +22,7 @@ func (builder PipelineBuilder) AddLastBuffered(bufSize int, op Operator) Pipelin
 	return builder
 }
 
-func (builder PipelineBuilder) SinkDefault() *Pipeline {
+func (builder PipelineBuilder) DefaultSink() *Pipeline {
 	return builder.pipeline.addLast(defaultSinkStage())
 }
 
