@@ -46,3 +46,10 @@ func (p Pipeline) Done() <-chan struct{} {
 func (p Pipeline) In() chan<- interface{} {
 	return p.head.in
 }
+
+func (p Pipeline) Drop() {
+	select {
+	case <-p.head.in:
+	default:
+	}
+}
