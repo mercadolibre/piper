@@ -14,7 +14,6 @@ func TestSplitter(t *testing.T) {
 	go splitter.run()
 	defer splitter.stop()
 
-	inputs := []int{1, 2, 3, 4, 5, 6}
 	go func() {
 		for _, x := range inputs {
 			splitter.in <- x
