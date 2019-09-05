@@ -1,6 +1,6 @@
 package piper
 
-func newSplitterStage(ps ...*Pipeline) *Stage {
+func newSplitterStage(ps ...*Pipeline) *stage {
 	return newSinkStage(makeSplitter(ps...))
 }
 

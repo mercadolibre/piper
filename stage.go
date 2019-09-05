@@ -1,29 +1,31 @@
 package piper
 
+// An Operator is function type used to add logic to each pipeline stage.
+// Each Operator takes an input and an output channel.
 type Operator func(<-chan interface{}, chan<- interface{})
 
-type Stage struct {
+type stage struct {
 	in   chan interface{}
 	out  chan interface{}
 	done chan struct{}
 
 	op   Operator
-	next *Stage
+	next *stage
 }
 
-func (s *Stage) run() {
+func (s *stage) run() {
 	defer close(s.out)
 
 	s.op(s.in, s.out)
 	s.done <- struct{}{}
 }
 
-func (s *Stage) stop() {
+func (s *stage) stop() {
 	close(s.in)
 }
 
-func newStage(op Operator) *Stage {
-	return &Stage{
+func newStage(op Operator) *stage {
+	return &stage{
 		done: make(chan struct{}, 1),
 		in:   make(chan interface{}),
 		out:  make(chan interface{}),
@@ -32,8 +34,8 @@ func newStage(op Operator) *Stage {
 	}
 }
 
-func newBufferedStage(bufSize int, op Operator) *Stage {
-	return &Stage{
+func newBufferedStage(bufSize int, op Operator) *stage {
+	return &stage{
 		done: make(chan struct{}, 1),
 		in:   make(chan interface{}, bufSize),
 		out:  make(chan interface{}, bufSize),
