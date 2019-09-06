@@ -3,7 +3,7 @@ Hello, this is Piper.
 
 Piper is your friend. 
 
-Piper is also a pipeline library for Go heavily influenced by [whiskybadger's article](https://whiskybadger.io/post/introducing-go-pipeline/) and [Netty](https://netty.io/)
+Piper is also a pipeline library for Go heavily influenced by [whiskybadger's article](https://whiskybadger.io/post/introducing-go-pipeline/) and [Netty](https://netty.io/).
 
 ## Operators
 Operators are the basic building blocks for the pipeline. These come in two flavors: regular and sink.
@@ -23,11 +23,11 @@ var mySinkOp = piper.SinkOperator(func(in <-chan interface{}){
 Operators are later wrapped in Stages to be added to the pipeline.
 
 ## What is a Pipeline?
-A pipeline is a list of Stages with an input channel and optionally an output
+A pipeline is a list of Stages with an input channel and optionally an output.
 
 ### How do i build one?
 With a PipelineBuilder of course! The builder provides a way to add stages to the pipeline. 
-These can buffered or not. This defines the way the entry channel will work.
+The entry channel can be buffered or not.
 
 ```go
 // a sample pipeline with an output
@@ -38,13 +38,13 @@ pipeline, out := piper.NewBuilder().
 // this one does not output anything
 pipeline := piper.NewBuilder().
     AddLast(anOperator).
-    Sink(sinkOperator)
+    Sink(aSinkOperator)
 
 ```
 All building functions come with its buffered flavor.
 
 ### Default Sink
-Piper also includes the default sink stage. This receives messages and discards them
+Piper also includes the default sink stage. It receives messages and discards them.
 ```go
 pipeline := piper.NewBuilder().
     AddLast(anOperator).
@@ -52,13 +52,13 @@ pipeline := piper.NewBuilder().
 ```
 
 ### Splitting
-Splitting is a way to create more complex pipelines. This works as a sink stage that ends the initial pipeline
-and forwards the output to a list of pipelnes
+Splitting is a way to create more complex pipelines. It works as a sink stage that ends the initial pipeline
+and forwards the output to a list of pipelines.
 ```go
 pipeline := piper.NewBuilder().
     Split(aPipeline, anotherPipeline, ...)
 ```
-The forwaring is made sequentially, so this could cause a starvation if one of the pipeline was stalled.
+The forwaring is made sequentially, so this could cause starvation if one of the pipelines stalls.
 
 
 ## Ok, i have my pipeline. How do i use it?
